@@ -2,7 +2,10 @@
 # from .mypvfactors import merge_data, pvfactors_engine_run, debug_pvarray
 # from .mybifacialvf import get_tmy3, bifacialvf_engine_run
 import numpy as np
+import pandas as pd
 import math
+from utils import ifnone
+from mypvfactors import pvfactors_engine_run
 
 chambery = {'Name':'Chambery', 'latitude': 45.637001, 'longitude': 5.881, 'Elevation': 235.0, 'TZ':-1.0}
 surfaces_reflectivity = {'glass': 1.526, 'ARglass': 1.3}
@@ -47,7 +50,16 @@ def system_def(albedo=0.4,
     else:
         h_center = h_ground
     
-    
+    #where to measure
+    if row_type=='first':
+        selected_row = 0 
+    elif row_type == 'last':
+        selected_row = n_pvrows-1
+    else:
+        selected_row = 1
+
+    cut = {i: {'front': 1,'back': back_measure_points if i == selected_row else 1} for i in range(n_pvrows)}
+
     pvarray_parameters = {'pvfactors': {
                                         'n_pvrows': n_pvrows,            # number of pv rows
                                         'pvrow_height': h_center,        # height of pvrows (measured at center / torque tube)
@@ -60,9 +72,7 @@ def system_def(albedo=0.4,
                                         'gcr': gcr,               # ground coverage ratio,
                                         'rho_front_pvrow': rho_front_pvrow,  # pv row front surface reflectivity
                                         'rho_back_pvrow': rho_back_pvrow,    # pv row back surface reflectivity
-                                        'cut':{
-                                            i: {'front': 1,'back': back_measure_points} for i in range(n_pvrows) # discretize the front  PV row into 3 segments and back in 5
-                                            }
+                                        'cut': cut
                                         },
                         'bifacialvf':  {'beta': surface_tilt,
                                         'sazm': surface_azimuth,
@@ -80,14 +90,38 @@ def system_def(albedo=0.4,
     }
     return pvarray_parameters
 
-# def run_simulation(data, pvarray_parameters, engine='pvfactors'):
-#     merged_data = merge_data(data.meteo, data.sunpos, pvarray_parameters['pvfactors'])
-#     if engine == 'pvfactors':   
-#         # idx = data.index.get_loc('9h 21 Dec 2017')
-#         # print(f'Viewing the PV plant at index {idx}:\n{merged_data.iloc[idx]}')
-#         idx = 10
-#         debug_pvarray(merged_data, pvarray_parameters['pvfactors'], idx=idx)
-#         res = pvfactors_engine_run(merged_data, pvarray_parameters['pvfactors'], parallel=8)
-#     if engine == 'bifacialvf':
-#         res = bifacialvf_engine_run(merged_data, pvarray_parameters['bifacialvf'], gps_data=pvarray_parameters['gps_data'])
-#     return res
+def merge_data(tmy_data, solpos, pvarray_parameters):
+    """Method to construct the pvfactors input DataFrame from the 
+    tmy file.
+    
+    Args:
+        tmy_data (pandas DataFrame): Contains columns (ghi, dni, dhi) 
+        solpos (pandas DataFrame): Contains columns (zenith, aziumth)
+        pvarray_parameters (dict): a dictionary containing columns (surface_tilt, surface_azimuth, albedo)
+    
+    Returns:
+        [type]: [description]
+    """
+    data = pd.DataFrame(index=tmy_data.index)
+    data['ghi'] = tmy_data.ghi
+    data['dni'] = tmy_data.dni
+    data['dhi'] = tmy_data.dhi
+    data['zenith'] = solpos.zenith
+    data['azimuth'] = solpos.azimuth
+    data['elevation'] = solpos.elevation
+    data['surface_tilt'] = pvarray_parameters['surface_tilt']
+    data['surface_azimuth'] = pvarray_parameters['surface_azimuth']
+    data['albedo'] =  pvarray_parameters['albedo']
+
+    #doing some patching
+    idxs = (data.zenith<90) & (data.ghi<10)
+    data.loc[idxs, 'zenith'] = 91.
+    return data
+
+def run_simulation(data, pvarray_parameters, engine='pvfactors'):
+    merged_data = merge_data(data.meteo, data.sunpos, pvarray_parameters['pvfactors'])
+    if engine == 'pvfactors':   
+        res = pvfactors_engine_run(merged_data, pvarray_parameters['pvfactors'], parallel=8)
+    # if engine == 'bifacialvf':
+    #     res = bifacialvf_engine_run(merged_data, pvarray_parameters['bifacialvf'], gps_data=pvarray_parameters['gps_data'])
+    return res
