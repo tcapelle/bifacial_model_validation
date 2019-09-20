@@ -1,0 +1,16 @@
+name: bifacial_model_validation
+channels:
+  - conda-forge
+  - pvlib
+dependencies:
+  - python>=3.7
+  - numpy
+  - pandas 
+  - shapely>=1.6.4
+  - matplotlib
+  - pvlib>=0.6
+  - pip
+  - jupyterlab
+  - pip:
+    #not available on conda
+    - pvfactors
