@@ -14,8 +14,8 @@ This repository is to exchange modelling techniques for bifacial model validatio
 
 In short, if you have anaconda, execute:
 ```
-$ conda env create --file=envirnment.yml
-$ conda activate bifacial_model_validation_
+$ conda env create --file=environment.yml
+$ conda activate bifacial_model_validation
 $ jupyter lab
 ```
 
