@@ -6,6 +6,7 @@ import pandas as pd
 import math
 from utils import ifnone
 from mypvfactors import pvfactors_engine_run
+from mybifacialvf import bifacialvf_engine_run
 
 chambery = {'Name':'Chambery', 'latitude': 45.637001, 'longitude': 5.881, 'Elevation': 235.0, 'TZ':-1.0}
 surfaces_reflectivity = {'glass': 1.526, 'ARglass': 1.3}
@@ -122,6 +123,6 @@ def run_simulation(data, pvarray_parameters, engine='pvfactors'):
     merged_data = merge_data(data.meteo, data.sunpos, pvarray_parameters['pvfactors'])
     if engine == 'pvfactors':   
         res = pvfactors_engine_run(merged_data, pvarray_parameters['pvfactors'], parallel=8)
-    # if engine == 'bifacialvf':
-    #     res = bifacialvf_engine_run(merged_data, pvarray_parameters['bifacialvf'], gps_data=pvarray_parameters['gps_data'])
+    if engine == 'bifacialvf':
+        res = bifacialvf_engine_run(merged_data, pvarray_parameters['bifacialvf'], gps_data=pvarray_parameters['gps_data'])
     return res

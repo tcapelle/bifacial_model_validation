@@ -23,19 +23,20 @@ def pvfactors_engine_run(data, pvarray_parameters, parallel=0, mode='full'):
         data (pandas DataFrame): The data to fit the model.
         pvarray_parameters (dict): The pvfactors dict describing the simulation.
         parallel (int, optional): Number of threads to launch. Defaults to 0 (just calls PVEngine.run_all_timesteps)
+        mode (str): full or fast depending on the type of back irraadiances. See pvfactors doc.
     
     Returns:
         pandas DataFrame: The results of the simulation, as desired in MyReportBuilder.
     """
     n, row = _get_cut(pvarray_parameters['cut'])
-    if parallel>0:
-        report = run_parallel_engine(Report(n, row), pvarray_parameters, data.index, 
+    rb = Report(n, row)
+    if parallel>1:
+        report = run_parallel_engine(rb, pvarray_parameters, data.index, 
                                 data.dni, data.dhi, 
                                 data.zenith, data.azimuth, 
                                 data.surface_tilt, data.surface_azimuth, 
                                 data.albedo, n_processes=parallel)
     else:
-        rb = Report(n, row)
         pvarray = OrderedPVArray.init_from_dict(pvarray_parameters)
         engine = PVEngine(pvarray)
         engine.fit(data.index, 
@@ -48,7 +49,7 @@ def pvfactors_engine_run(data, pvarray_parameters, parallel=0, mode='full'):
                     data.albedo,
                     data.ghi)
         if mode == 'full': report = engine.run_full_mode(rb.build)
-        else: report = engine.run_fast_mode(rb.build, pvrow_index=0)
+        else: report = engine.run_fast_mode(rb.build, pvrow_index=0, segment_index=0)
     df_report = pd.DataFrame(report, index=data.index).fillna(0)
     return df_report
 
