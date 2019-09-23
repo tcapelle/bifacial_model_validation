@@ -16,7 +16,6 @@ In short, if you have anaconda, execute:
 ```
 $ conda env create --file=environment.yml
 $ conda activate bifacial_model_validation
-$ pip install git+https://github.com/tcapelle/bifacialvf
 $ jupyter lab
 ```
 
