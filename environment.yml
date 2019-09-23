@@ -14,3 +14,4 @@ dependencies:
   - pip:
     #not available on conda
     - pvfactors
+    - git+https://github.com/tcapelle/bifacialvf
