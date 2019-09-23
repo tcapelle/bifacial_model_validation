@@ -1,4 +1,4 @@
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/tcapelle/bifacial_model_validation_/master)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/tcapelle/bifacial_model_validation/master)
 
 
 # Bifacial Model validation
