@@ -3,7 +3,7 @@
 
 # Bifacial Model validation
 
-This repository is to exchange modelling techniques for bifacial model validation
+This repository is to exchange modelling techniques for bifacial model validation.
 
 ## Installation
 
@@ -24,3 +24,8 @@ $ jupyter lab
 
 Open Jupyter Lab (or notebook) and run them interactively.
 You can also click the [binder](https://mybinder.org/v2/gh/tcapelle/bifacial_modelling/master) icon and run them on the web.
+
+## Notebook 01
+
+In this notebook we construct a simulation of 2D Viewfactor models. Here a `pvfactors` and `bifacialvf` simulation is done with the same inputs, using some wrapper methods around both libraries.
+The idea behind is to be able to compare apples to apples both frameworks.
