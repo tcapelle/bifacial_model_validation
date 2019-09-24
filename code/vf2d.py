@@ -91,28 +91,29 @@ def system_def(albedo=0.4,
     }
     return pvarray_parameters
 
-def merge_data(tmy_data, solpos, pvarray_parameters):
+def merge_data(weather, sunpos, surface_tilt, surface_azimuth, albedo):
     """Method to construct the pvfactors input DataFrame from the 
     tmy file.
     
     Args:
-        tmy_data (pandas DataFrame): Contains columns (ghi, dni, dhi) 
-        solpos (pandas DataFrame): Contains columns (zenith, aziumth)
-        pvarray_parameters (dict): a dictionary containing columns (surface_tilt, surface_azimuth, albedo)
-    
+        weather (pandas DataFrame): Contains columns (ghi, dni, dhi) 
+        sunpos (pandas DataFrame): Contains columns (zenith, aziumth)
+        surface_tilt (float or pandas Series): The tilt of the system. Can be a value or a pandas Series.
+        surface_azimuth (float or pandas Series): The azimuth of the system. Can be a value or a pandas Series.
+        alebdo (float or pandas Series): The ground albedo. Can be a value or a pandas Series.
     Returns:
-        [type]: [description]
+        data (pandas DatFrame): Returns the merged DataFrame.
     """
-    data = pd.DataFrame(index=tmy_data.index)
-    data['ghi'] = tmy_data.ghi
-    data['dni'] = tmy_data.dni
-    data['dhi'] = tmy_data.dhi
-    data['zenith'] = solpos.zenith
-    data['azimuth'] = solpos.azimuth
-    data['elevation'] = solpos.elevation
-    data['surface_tilt'] = pvarray_parameters['surface_tilt']
-    data['surface_azimuth'] = pvarray_parameters['surface_azimuth']
-    data['albedo'] =  pvarray_parameters['albedo']
+    data = pd.DataFrame(index=weather.index)
+    data['ghi'] = weather.ghi
+    data['dni'] = weather.dni
+    data['dhi'] = weather.dhi
+    data['zenith'] = sunpos.zenith
+    data['azimuth'] = sunpos.azimuth
+    data['elevation'] = sunpos.elevation
+    data['surface_tilt'] = surface_tilt
+    data['surface_azimuth'] = surface_azimuth
+    data['albedo'] =  albedo
 
     #doing some patching
     idxs = (data.zenith<90) & (data.ghi<10)
