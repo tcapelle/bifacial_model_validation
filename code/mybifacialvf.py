@@ -19,10 +19,10 @@ def format_output(res, cuts):
     aux =  aux.rename(columns=dict(zip(back_cols,[f'qinc_back_{i}' for i in range(cuts-1, -1, -1)] )))
     return aux[['qinc_front', 'qinc_back_mean']+[f'qinc_back_{i}' for i in range(cuts)]]
 
-def bifacialvf_engine_run(data,  pvarray_parameters, gps_data):
+def bifacialvf_engine_run(data,  pvarray_parameters, gps_data, **kwargs):
     'Wrapper to run simulate using pvarray_parameters'
     tmy3 = _get_tmy3(data)
     outfile = 'output.csv'
-    simulate_inner(tmy3, gps_data, outfile, **pvarray_parameters, sam_header=False)
+    simulate_inner(tmy3, gps_data, outfile, **pvarray_parameters, sam_header=False, **kwargs)
     return (pd.read_csv(outfile, header=2, index_col='date', parse_dates=True)
             .pipe(format_output, cuts=pvarray_parameters['cellRows']))

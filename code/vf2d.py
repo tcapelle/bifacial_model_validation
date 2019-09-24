@@ -37,6 +37,7 @@ def system_def(albedo=0.4,
     def compute_rho(n2): return math.pow((n2 - 1.0) / (n2 + 1.0), 2.0)
     rho_front_pvrow =  compute_rho(surfaces_reflectivity[frontSurface])
     rho_back_pvrow =  compute_rho(surfaces_reflectivity[backSurface])
+    
     #bifacialvf variables
     C = h_ground/slope #compute normalized ground_height 
     rtr = rtr_spacing/slope #normalized rtr spacing
@@ -45,9 +46,9 @@ def system_def(albedo=0.4,
     cellRows = back_measure_points              # CellRows(# hor rows in panel)   
                                 #This is the number of irradiance values returned along module chord
     
-    # phisical
+    # physical
     if not tracking:
-        h_center = h_ground + np.sin(2*np.pi*surface_tilt/360)*h_m
+        h_center = h_ground + np.sin(np.pi * surface_tilt / 180) * h_m
     else:
         h_center = h_ground
     
@@ -85,7 +86,8 @@ def system_def(albedo=0.4,
                                         'PVfrontSurface': frontSurface,
                                         'PVbackSurface': backSurface,
                                         'albedo':albedo,
-                                        'tracking': tracking
+                                        'tracking': tracking,
+                                        'backtrack': False
                                         },
                         'gps_data': gps_data
     }
